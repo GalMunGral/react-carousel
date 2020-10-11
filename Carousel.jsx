@@ -9,7 +9,8 @@ const Container = styled.div`
   margin: 50px auto;
   position: relative;
   transform-style: preserve-3d;
-  perspective: 100px;
+  perspective: 150px;
+  perspective-origin: center center;
 `;
 
 const Slide = styled.div`
@@ -29,7 +30,13 @@ const Slide = styled.div`
     ),
     0,
     ${({ offset }) =>
-      offset === 0 ? 10 : offset === 1 || offset === -1 ? 0 : -10}px
+      offset === 0
+        ? 10
+        : Math.abs(offset) === 1
+        ? 0
+        : Math.abs(offset) === 2
+        ? -10
+        : -20}px
   );
   filter: brightness(${({ offset }) => (offset === 0 ? 1 : 0.5)});
   transition: all 0.5s ease-in-out ${({ offset }) => (offset === 0 ? 0.1 : 0)}s;
@@ -63,6 +70,11 @@ function Carousel({ items, height, width, interval }) {
       height={height}
       width={width}
       onMouseEnter={() => {
+        clearTimeout(timer);
+      }}
+      onMouseMove={() => {
+        // Freeze on 'mousemove' instead of 'mouseenter' after clicking
+        // 'mouseenter' won't fire because mouse is already inside the element
         clearTimeout(timer);
       }}
       onMouseLeave={() => {
